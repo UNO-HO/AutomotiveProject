@@ -50,6 +50,7 @@
 ## 테스트 환경
 
 - Pleos Connect Emulator v2.1.0 (API 34)
+- 화면 규격: 2560×1440, 160 dpi
 - Android Gradle Plugin 8.7.3, Kotlin 2.0.21, Jetpack Compose
 - Pleos SDK: NaviHelper 3.0.5, TextToSpeech 3.3.1
 
