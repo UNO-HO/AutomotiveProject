@@ -55,7 +55,7 @@
 
 ## APK
 
-`apk/` 폴더에 release APK가 있습니다.
+`apk/오은호_편안길_release.apk` (release 빌드)
 
 ## 사용한 SDK / API
 

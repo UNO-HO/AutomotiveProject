@@ -11,3 +11,6 @@ captures/
 .engine_update.tgz
 .xfer/
 .kotlin/
+
+# 빌드 결과물 (제출용 APK는 apk/ 폴더에 따로 둠)
+app/release/
