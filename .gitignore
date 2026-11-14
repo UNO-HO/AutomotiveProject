@@ -1,0 +1,13 @@
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+captures/
+
+# 옮기기용 임시 파일
+.source.zip
+.engine_update.tgz
+.xfer/
+.kotlin/
