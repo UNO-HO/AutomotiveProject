@@ -157,10 +157,14 @@ class RideViewModel(app: Application) : AndroidViewModel(app) {
                 speech.trySend(Caption(e.message, forChild = false))
                 log("휴식 제안 · 예상 지수 ${e.suggestion.predictedIndexAtEnd.coerceAtMost(100)}", LogKind.REST)
             }
-            is RideEvent.ChildAudioCue -> {
+            is RideEvent.CurveAheadNotice -> {
                 speech.trySend(Caption(e.message, forChild = true))
                 _ui.update { it.copy(lastChildCue = e.message) }
-                log("아이에게 창밖 보기 안내", LogKind.CHILD)
+                log("굽은 길 구간 시작 안내", LogKind.CHILD)
+            }
+            is RideEvent.ComfortCheck -> {
+                speech.trySend(Caption(e.message, forChild = true))
+                log("안부: ${e.message}", LogKind.CHILD)
             }
             is RideEvent.SuggestLowerRegen -> {
                 speech.trySend(Caption(e.message, forChild = false))

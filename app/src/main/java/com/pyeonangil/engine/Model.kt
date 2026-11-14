@@ -63,8 +63,11 @@ sealed interface RideEvent {
     /** 위험 구간 직전 휴식 제안. */
     data class SuggestRest(val suggestion: RestSuggestion, val message: String) : RideEvent
 
-    /** 아이에게 말하는 오디오 큐 (창밖 보기 유도). */
-    data class ChildAudioCue(val message: String) : RideEvent
+    /** 굽은 길 구간이 곧 시작된다는 안내 (탑승자 모두에게, 구간마다 한 번). */
+    data class CurveAheadNotice(val message: String) : RideEvent
+
+    /** 멀미 지수가 높을 때 가끔 건네는 안부 (괜찮은지, 심호흡, 환기). */
+    data class ComfortCheck(val message: String) : RideEvent
 
     /** EV 회생제동 단계를 낮추자는 제안. */
     data class SuggestLowerRegen(val message: String) : RideEvent

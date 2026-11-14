@@ -83,7 +83,7 @@ class RideEngineTest {
         val turns = (0 until 20).map { i -> UpcomingTurn(1_000f + i * 240f, 1f, "TURN", 1) }
         engine.onRoute(turns, 10_000f)
         val events = drive(engine, 120, speed = { 13.0 })
-        assertEquals(1, events.filterIsInstance<RideEvent.ChildAudioCue>().size)
+        assertEquals(1, events.filterIsInstance<RideEvent.CurveAheadNotice>().size)
         assertEquals(1, events.filterIsInstance<RideEvent.SuggestLowerRegen>().size)
     }
 
@@ -136,7 +136,7 @@ class RideEngineTest {
             t += 0.2
         }
         assertEquals(1, events.filterIsInstance<RideEvent.SuggestRest>().size)
-        assertEquals(1, events.filterIsInstance<RideEvent.ChildAudioCue>().size)
+        assertEquals(1, events.filterIsInstance<RideEvent.CurveAheadNotice>().size)
         assertTrue(events.any { it == RideEvent.AskChildFeedback })
         assertTrue(events.any { it is RideEvent.CoachDriver })
         val report = engine.report()
@@ -221,5 +221,32 @@ class DrivingFeelTest {
         while (t < 30) { e.onSample(MotionSample((t * 1000).toLong(), (20 + 6 * kotlin.math.sin(t)).toFloat())); t += 0.2 }
         while (t < 60) { e.onSample(MotionSample((t * 1000).toLong(), 20f)); t += 0.2 }
         assertEquals(DrivingFeel.SMOOTH, e.state.feel)
+    }
+}
+
+class ComfortCheckTest {
+    private fun run(engine: RideEngine, seconds: Int, yaw: Double): List<RideEvent> {
+        val out = ArrayList<RideEvent>()
+        var t = 0.0
+        while (t < seconds) {
+            out += engine.onSample(MotionSample((t * 1000).toLong(), 13f, (yaw * kotlin.math.sin(2 * kotlin.math.PI * t / 9.0)).toFloat()))
+            t += 0.2
+        }
+        return out
+    }
+
+    @Test
+    fun calmDrivingHasNoCheckIns() {
+        val events = run(RideEngine(), 40 * 60, yaw = 0.0)
+        assertEquals(0, events.count { it is RideEvent.ComfortCheck })
+    }
+
+    @Test
+    fun curvyRoadGetsSpacedRotatingCheckIns() {
+        val events = run(RideEngine(), 45 * 60, yaw = 0.12).filterIsInstance<RideEvent.ComfortCheck>()
+        assertTrue("안부가 있어야 한다", events.size >= 2)
+        assertTrue("10분 간격이므로 많지 않다", events.size <= 4)
+        assertEquals(Tuning.CHECKIN_MESSAGES[0], events[0].message)
+        assertEquals(Tuning.CHECKIN_MESSAGES[1], events[1].message)
     }
 }

@@ -36,7 +36,9 @@ class RideEngine(
     private var remainingRouteM: Float? = null
     /** 이미 휴식을 제안한 위험 구간의 끝(누적 m). 그 전까지 시작하는 위험 구간에는 다시 제안하지 않는다. */
     private var restHandledUntilOdoM = -1.0
-    /** 이미 아이 오디오 큐를 말한 위험 구간의 끝(누적 m). */
+    /** 이미 굽은 길 시작 안내를 한 위험 구간의 끝(누적 m). */
+    private var lastCheckInMs = 0L
+    private var checkInCount = 0
     private var childCuedUntilOdoM = -1.0
     /** 최근 주행 속도 평균 (m/s). 남은 시간 계산용. */
     private var avgSpeedMps = 0f
@@ -96,6 +98,15 @@ class RideEngine(
         val rawIndex = dose.rawIndex(profile.sensitivity)
         val index = rawIndex.roundToInt().coerceIn(0, 100)
         peakIndex = maxOf(peakIndex, index)
+
+        // 지수가 오른 상태로 달리는 중이면 가끔 안부를 건넨다. 다른 안내와 겹치지 않게 한다.
+        if (!stopped && events.isEmpty() && index >= Tuning.CHECKIN_MIN_INDEX &&
+            elapsed - lastCheckInMs >= Tuning.CHECKIN_INTERVAL_MS
+        ) {
+            lastCheckInMs = elapsed
+            events += RideEvent.ComfortCheck(Tuning.CHECKIN_MESSAGES[checkInCount % Tuning.CHECKIN_MESSAGES.size])
+            checkInCount++
+        }
 
         state = state.copy(
             index = index,
@@ -190,7 +201,7 @@ class RideEngine(
 
             if (absStart > childCuedUntilOdoM && startAhead <= Tuning.CHILD_CUE_AHEAD_M) {
                 childCuedUntilOdoM = absEnd
-                out += RideEvent.ChildAudioCue("곧 꼬불꼬불 길이야! 화면은 잠깐 내려놓고, 창밖에 산이 몇 개 보이는지 세어 볼까?")
+                out += RideEvent.CurveAheadNotice("곧 멀미가 심해질 수 있는 굽은 길 구간이 시작됩니다.")
                 if (isEv) out += RideEvent.SuggestLowerRegen("구불구불한 길이 시작돼요. 회생제동을 한 단계 낮추면 뒷자리가 편해요.")
             }
         }

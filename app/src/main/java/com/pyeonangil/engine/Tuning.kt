@@ -73,8 +73,20 @@ object Tuning {
     const val CUE_TURN_AHEAD_M = 300f
     /** 감속 큐를 보여줄 종방향 감속도 (m/s²). */
     const val CUE_SLOWING_MPS2 = -1.2f
-    /** 아이 오디오 큐를 말할 위험 구간 직전 거리 (m). */
+    /** 굽은 길 시작 안내를 할 위험 구간 직전 거리 (m). */
     const val CHILD_CUE_AHEAD_M = 1_500f
+
+    // ---- 탑승자 안부 ----
+    /** 지수가 이 값 이상일 때만 안부를 건넨다 ("조금 흔들려요" 단계부터). */
+    const val CHECKIN_MIN_INDEX = 40
+    /** 안부 사이 최소 간격 (ms). */
+    const val CHECKIN_INTERVAL_MS = 10 * 60_000L
+    /** 차례로 돌아가며 건네는 안부. */
+    val CHECKIN_MESSAGES = listOf(
+        "멀미는 괜찮으신가요?",
+        "창밖 먼 곳을 보며 천천히 심호흡해 보세요.",
+        "창문을 조금 열어 볼까요?",
+    )
 
     // ---- 정차 피드백 ----
     /** 정차 후 이 시간이 지나면 아이 상태를 묻는다 (ms). */
